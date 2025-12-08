@@ -39,16 +39,16 @@
 ## Job script ##
 # environments
 # ---------------------------------
-pip install --user --no-cache-dir --quiet \
-    PyYAML \
-    torch \
-    torchvision \
-    tqdm \
-    numpy \
-    scipy \
-    matplotlib \
-    h5py \
-    certifi
+# pip install --user --no-cache-dir --quiet \
+#    PyYAML \
+#    torch \
+#    torchvision \
+#    tqdm \
+#    numpy \
+#    scipy \
+#    matplotlib \
+#    h5py \
+#    certifi
 
 # ---------------------------------
 # Copy script input data and go to working directory
@@ -59,15 +59,30 @@ cd $LOCAL_WORK_DIR/
 echo Working directory : $PWD
 echo "Job started at `date`"
 
-module list
+# Last-resort: build a venv with system python if still empty
+if [ -z "$PYTHON_BIN" ]; then
+  if command -v module >/dev/null 2>&1; then
+    module load python/3.11.9 2>/dev/null || module load python/3.10.10 2>/dev/null || true
+  fi
+  BASE_PY="$(command -v python3 || true)"
+  if [ -z "$BASE_PY" ]; then
+    echo "[ERROR] Aucun python3 trouvÃ©. Fixez PYTHON_BIN (ex: ~/miniconda3/envs/h2ogpt/bin/python)." >&2
+    echo "[DEBUG] Tried candidates: ${PYTHON_CANDIDATES[*]}" >&2
+    exit 1
+  fi
+  VENV_DIR="${SLURM_TMPDIR:-$HOME/.cache}/bcresnet_venv"
+  "${BASE_PY}" -m venv "$VENV_DIR"
+  # shellcheck disable=SC1091
+  source "$VENV_DIR/bin/activate"
+  pip install --upgrade pip >/dev/null
+  pip install PyYAML torch torchvision tqdm numpy scipy matplotlib h5py certifi >/dev/null
+  PYTHON_BIN="$VENV_DIR/bin/python"
+fi
 
-echo "Librairies PIP"
-pip list
-
-echo "Lancement du script"
+echo "[INFO] Using python at $PYTHON_BIN"
 
 cd examples/
-srun python -u run_resnet.py
+srun $PYTHON_BIN -u run_resnet.py
 
 echo "Job finished at `date`"
 
