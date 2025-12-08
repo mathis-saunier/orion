@@ -54,7 +54,7 @@
 # Copy script input data and go to working directory
 # ATTENTION : Il faut que le script soit dans le répertoire de travail
 rsync -av --exclude 'saved' ./ $LOCAL_WORK_DIR
-cd $LOCAL_WORK_DIR/
+cd "${SLURM_SUBMIT_DIR:-$PWD}" || exit 1
 
 echo Working directory : $PWD
 echo "Job started at `date`"
