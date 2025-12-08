@@ -18,7 +18,7 @@
 # GPUs architecture and number
 # ----------------------------
 # Partition (submission class)
-#SBATCH --partition all
+#SBATCH --partition mesonet
 
 # ----------------------------
 # processes / tasks
