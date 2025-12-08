@@ -55,7 +55,58 @@
 # ATTENTION : Il faut que le script soit dans le répertoire de travail
 
 # Chargement du module go
-spack load go@1.20.3 
+# --- Go / build toolchain: prefer spack module, sinon fallback local ---
+GO_MODULE="go@1.23.1"
+
+# try loading spack go; if it fails, try go@1.21 or fallback to local install
+if spack load "${GO_MODULE}" 2>/dev/null; then
+  echo "[INFO] Loaded ${GO_MODULE} via spack."
+else
+  echo "[WARN] spack couldn't load ${GO_MODULE}. Trying go@1.21..."
+  if ! spack load "go@1.21" 2>/dev/null; then
+    echo "[WARN] No suitable spack go found — installing go ${GO_MODULE#go@} locally in \$HOME/.local/go"
+    GO_VERSION="${GO_MODULE#go@}"   # e.g. 1.23.1
+    ARCH="$(uname -m)"
+    # choose tarball name (x86_64 -> amd64)
+    case "$ARCH" in
+      x86_64|amd64) TARCH="amd64" ;;
+      aarch64|arm64) TARCH="arm64" ;;
+      *) echo "[ERROR] arch $ARCH not handled"; exit 1 ;;
+    esac
+    TAR="go${GO_VERSION}.linux-${TARCH}.tar.gz"
+    cd /tmp || exit 1
+    curl -sSLO "https://dl.google.com/go/${TAR}" || { echo "[ERROR] curl failed"; exit 1; }
+    mkdir -p "$HOME/.local"
+    tar -C "$HOME/.local" -xzf "${TAR}"
+    export GOROOT="$HOME/.local/go"
+    export PATH="$GOROOT/bin:$PATH"
+    echo "[INFO] Installed local go at $GOROOT"
+  else
+    echo "[INFO] Loaded go@1.21 via spack (may be OK if repo needs >=1.21)."
+  fi
+fi
+
+# Ensure gcc is available for cgo (adjust module name if your cluster uses 'module' instead of spack)
+if ! command -v gcc >/dev/null 2>&1; then
+  if spack load gcc >/dev/null 2>&1; then
+    echo "[INFO] Loaded gcc via spack."
+  else
+    module load gcc 2>/dev/null || echo "[WARN] gcc module not found — ensure gcc is available."
+  fi
+fi
+
+# Environment fixes for building Go c-shared libs
+export CGO_ENABLED=1
+export CC="$(command -v gcc || true)"
+# Force use of local toolchain (prevents some automatic toolchain downloads)
+export GOTOOLCHAIN=local
+
+# Debug prints
+echo "[INFO] go -> $(command -v go || echo 'no-go')"
+go version || true
+echo "[INFO] gcc -> $CC"
+gcc --version | head -n 1 || true
+
 
 rsync -av --exclude 'saved' ./ $LOCAL_WORK_DIR
 cd "${SLURM_SUBMIT_DIR:-$PWD}" || exit 1
@@ -90,7 +141,13 @@ if [ -z "$PYTHON_BIN" ]; then
   pip install scipy matplotlib h5py certifi >/dev/null
   echo "scipy, matplotlib, h5py, and certifi installed."
   PYTHON_BIN="$VENV_DIR/bin/python"
-  pip install -e .
+
+  # après activation du venv (déjà dans ton script)
+  echo "[DEBUG] go binary used: $(which go || echo no-go)"
+  go version || echo "go not available — aborting pip build (or will fail)."
+
+  # build install
+  pip install -e . -v
   echo "orion -e . installed."
 fi
 
