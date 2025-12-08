@@ -91,7 +91,7 @@ fi
 echo "[INFO] Using python at $PYTHON_BIN"
 
 ls
-cd orion/examples/
+cd examples/
 srun $PYTHON_BIN -u run_resnet.py
 
 echo "Job finished at `date`"
