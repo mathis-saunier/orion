@@ -24,6 +24,10 @@
 # processes / tasks
 #SBATCH -n 1
 
+# ------------------------
+# Job time (hh:mm:ss)
+#SBATCH --time 1:00:00
+# ------------------------
 
 ##SBATCH --mail-type ALL
 # User e-mail address
