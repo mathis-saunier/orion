@@ -75,7 +75,16 @@ if [ -z "$PYTHON_BIN" ]; then
   # shellcheck disable=SC1091
   source "$VENV_DIR/bin/activate"
   pip install --upgrade pip >/dev/null
-  pip install PyYAML torch torchvision tqdm numpy scipy matplotlib h5py certifi >/dev/null
+  pip install PyYAML
+  echo "PyYAML installed."
+  pip install torch
+  echo "torch installed."
+  pip install torchvision
+  echo "torchvision installed."
+  pip install tqdm numpy
+  echo "tqdm and numpy installed."
+  pip install scipy matplotlib h5py certifi >/dev/null
+  echo "scipy, matplotlib, h5py, and certifi installed."
   PYTHON_BIN="$VENV_DIR/bin/python"
 fi
 
