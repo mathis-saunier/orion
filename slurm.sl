@@ -163,9 +163,9 @@ fi
 
 echo "[INFO] Using python at $PYTHON_BIN"
 
-ls
-cd examples/
-srun $PYTHON_BIN -u run_resnet.py
+# assure-toi que VENV_DIR est défini plus haut (ex: VENV_DIR="${SLURM_TMPDIR:-$HOME/.cache}/bcresnet_venv")
+srun bash -lc "source '$VENV_DIR/bin/activate' && echo 'Using python: ' \$(which python) && python -c 'import orion; print(\"orion:\", getattr(orion,\"__file__\",None))' && cd examples && python -u run_resnet.py"
+
 
 echo "Job finished at `date`"
 
