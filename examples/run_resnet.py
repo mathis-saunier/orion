@@ -4,6 +4,8 @@ import torch
 import torchvision.transforms as transforms
 from PIL import Image
 import orion
+import sys
+sys.path.insert(0, "../")
 import orion.models as models
 from orion.core.utils import (
     get_cifar_datasets,
