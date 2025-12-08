@@ -90,9 +90,8 @@ if [ -z "$PYTHON_BIN" ]; then
   pip install scipy matplotlib h5py certifi >/dev/null
   echo "scipy, matplotlib, h5py, and certifi installed."
   PYTHON_BIN="$VENV_DIR/bin/python"
-  pip install orion
   pip install -e .
-  echo "orion installed."
+  echo "orion -e . installed."
 fi
 
 echo "[INFO] Using python at $PYTHON_BIN"
