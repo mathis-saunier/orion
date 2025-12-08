@@ -54,13 +54,8 @@
 # Copy script input data and go to working directory
 # ATTENTION : Il faut que le script soit dans le répertoire de travail
 
-# Installation de go (à faire une seule fois par machine)
-cd /tmp
-wget https://go.dev/dl/go1.22.3.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf go1.22.3.linux-amd64.tar.gz
-echo 'export PATH=/usr/local/go/bin:$PATH' >> ~/.bashrc
-source ~/.bashrc
-go version # go version go1.22.3 linux/amd64
+# Chargement du module go
+spack load go@1.20.3 
 
 rsync -av --exclude 'saved' ./ $LOCAL_WORK_DIR
 cd "${SLURM_SUBMIT_DIR:-$PWD}" || exit 1
