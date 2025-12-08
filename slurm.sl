@@ -150,15 +150,6 @@ if [ -z "$PYTHON_BIN" ]; then
   pip install -e . -v
   echo "orion -e . installed."
 
-  # vérifie le python utilisé et que 'orion' est importable
-  "$PYTHON_BIN" -c "import sys, importlib, pkgutil; print('PYTHON=', sys.executable); print('sys.path=', sys.path[:6]); \
-   try: import orion; print('orion:', getattr(orion,'__file__',orion)); \
-   except Exception as e: print('IMPORT-ERROR', e); \
-   print('site-packages dirs:', [p for p in sys.path if 'site-packages' in str(p)])"
-  # liste les .egg-link / site-packages pour confirmer l'install editable
-  "$PYTHON_BIN" -c "import site, glob, sys; print('site-packages:', site.getsitepackages() if hasattr(site,'getsitepackages') else site.getusersitepackages()); \
-   import pkgutil; print('orion found in modules:', any(m.name=='orion' for m in pkgutil.iter_modules()))"
-
 fi
 
 echo "[INFO] Using python at $PYTHON_BIN"
