@@ -1,6 +1,8 @@
 import time
 import math
 import torch
+import torchvision.transforms as transforms
+from PIL import Image
 import orion
 import orion.models as models
 from orion.core.utils import (
@@ -14,31 +16,32 @@ torch.manual_seed(42)
 
 # Initialize the Orion scheme, model, and data
 scheme = orion.init_scheme("../configs/resnet.yml")
-trainloader, testloader = get_cifar_datasets(data_dir="../data", batch_size=1)
 net = models.ResNet20()
 
-# Train model (optional)
-# device = "cuda" if torch.cuda.is_available() else "cpu"
-# train_on_cifar(net, data_dir="../data", epochs=1, device=device)
+# Load image from img_test folder
+img_path = "../img_test/luis.png"  # Remplacer par le nom de l'image
+image = Image.open(img_path).convert('RGB')
 
-# Get a test batch to pass through our network
-inp, _ = next(iter(testloader))
+# Preprocess image to match CIFAR-10 format
+transform = transforms.Compose([
+    transforms.Resize((32, 32)),
+    transforms.ToTensor(),
+    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
+])
+inp = transform(image).unsqueeze(0)  # Add batch dimension
 
 # Run cleartext inference
 net.eval()
 out_clear = net(inp)
 
-# Prepare for FHE inference. 
-# Some polynomial activation functions require knowing the range of possible 
-# input values. We'll estimate these ranges using training set statistics, 
-# adjusted to be wider by a tolerance factor (= margin).
+# Prepare for FHE inference
 orion.fit(net, inp)
 input_level = orion.compile(net)
 
-# Encode and encrypt the input vector 
+# Encode and encrypt
 vec_ptxt = orion.encode(inp, input_level)
 vec_ctxt = orion.encrypt(vec_ptxt)
-net.he()  # Switch to FHE mode
+net.he()
 
 # Run FHE inference
 print("\nStarting FHE inference", flush=True)
@@ -46,11 +49,11 @@ start = time.time()
 out_ctxt = net(vec_ctxt)
 end = time.time()
 
-# Get the FHE results and decrypt + decode.
+# Decrypt and decode
 out_ptxt = out_ctxt.decrypt()
 out_fhe = out_ptxt.decode()
 
-# Compare the cleartext and FHE results.
+# Compare results
 print()
 print(out_clear)
 print(out_fhe)
