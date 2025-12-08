@@ -37,19 +37,6 @@
 
 
 ## Job script ##
-# environments
-# ---------------------------------
-# pip install --user --no-cache-dir --quiet \
-#    PyYAML \
-#    torch \
-#    torchvision \
-#    tqdm \
-#    numpy \
-#    scipy \
-#    matplotlib \
-#    h5py \
-#    certifi
-
 # ---------------------------------
 # Copy script input data and go to working directory
 # ATTENTION : Il faut que le script soit dans le répertoire de travail
