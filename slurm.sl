@@ -29,6 +29,8 @@
 #SBATCH --time 1:00:00
 # ------------------------
 
+#SBATCH --account=m25206
+
 ##SBATCH --mail-type ALL
 # User e-mail address
 #SBATCH --mail-user mathis.saunier@insa-rouen.fr
