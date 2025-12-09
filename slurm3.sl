@@ -121,7 +121,7 @@ echo "[DEBUG] go binary used: $(which go || echo no-go)"
 go version || echo "go not available — aborting pip build (or will fail)."
 
 # build install
-pip install -e . -v
+pip install -e .
 echo "orion -e . installed."
 
 echo "Job started at `date`"
