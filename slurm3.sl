@@ -121,6 +121,11 @@ echo "[DEBUG] go binary used: $(which go || echo no-go)"
 go version || echo "go not available — aborting pip build (or will fail)."
 
 # build install
+# Désinstallez la librairie publique si elle est présente
+pip uninstall orion -y
+
+# Désinstallez votre version actuelle pour repartir au propre
+pip uninstall orion-fhe -y
 pip install -e .
 echo "orion -e . installed."
 
