@@ -19,7 +19,7 @@
 # ----------------------------
 # Partition (submission class)
 #SBATCH --partition mesonet
-#SBATCH --mem=32G
+#SBATCH --mem=80G
 # ----------------------------
 # processes / tasks
 #SBATCH -n 1
