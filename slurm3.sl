@@ -47,8 +47,14 @@ GO_MODULE="go@1.23.1"
 PYTHON_MODULE="python@3.11.9"
 SETUP_TOOLS_MODULE="py-setuptools@67.6.0"
 PIP_MODULE="py-pip@23.0"
+CUDA_MODULE="cuda@12.6.2"
 
 # try loading spack modules
+if spack load "${CUDA_MODULE}" 2>/dev/null; then
+  echo "[INFO] Loaded ${CUDA_MODULE} via spack."
+else
+  echo "[WARN] spack couldn't load ${CUDA_MODULE}."
+fi
 if spack load "${GO_MODULE}" 2>/dev/null; then
   echo "[INFO] Loaded ${GO_MODULE} via spack."
 else
