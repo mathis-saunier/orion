@@ -19,7 +19,7 @@
 # ----------------------------
 # Partition (submission class)
 #SBATCH --partition mesonet
-#SBATCH --gpu=1
+#SBATCH --gpus=1
 #SBATCH --mem=80G
 # ----------------------------
 # processes / tasks
