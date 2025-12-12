@@ -376,6 +376,7 @@ def train(
     for epoch in range(epochs):
         train_epoch(epoch, model, train_loader, criterion, optimizer, device)
         test_acc = test_epoch(model, test_loader, criterion, device)
+        print(f"Validation Accuracy: {test_acc:.3f}%")
 
         # Save the model if the test accuracy improves
         if save_path and test_acc > best_acc:
@@ -397,6 +398,8 @@ def train_epoch(epoch, model, train_loader, criterion, optimizer, device):
     """
     Perform one training epoch.
     """
+    if device.type == 'cuda':
+        torch.cuda.reset_peak_memory_stats(device)
     model.train()
     train_loss = 0
     correct = 0
@@ -422,10 +425,13 @@ def train_epoch(epoch, model, train_loader, criterion, optimizer, device):
         correct += predicted.eq(targets).sum().item()
 
         # Update progress bar
-        train_bar.set_postfix({
+        postfix = {
             "Loss": f"{train_loss / (batch_idx + 1):.3f}",
             "Acc": f"{100. * correct / total:.3f}% ({correct}/{total})"
-        })
+        }
+        if device.type == 'cuda':
+            postfix["Mem"] = f"{torch.cuda.max_memory_allocated(device) / 1024**2:.2f}MB"
+        train_bar.set_postfix(postfix)
 
 
 def test_epoch(model, test_loader, criterion, device):
