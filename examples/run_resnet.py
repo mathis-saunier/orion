@@ -28,7 +28,7 @@ time_start = time.time()
 # Train model (optional)
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print("Utilisation de l'appareil :", device, "\n")
-train_on_cifar(net, data_dir="../data", epochs=3, device=device)
+train_on_cifar(net, data_dir="../data", epochs=300, device=device)
 
 print(f"Entraînement terminé en {time.time() - time_start:.2f} secondes.\n")
 

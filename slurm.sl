@@ -27,7 +27,7 @@
 
 # ------------------------
 # Job time (hh:mm:ss)
-# #SBATCH --time 24:00:00
+#SBATCH --time 12:00:00
 # ------------------------
 
 #SBATCH --account=m25206
