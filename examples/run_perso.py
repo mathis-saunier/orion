@@ -31,17 +31,33 @@ def new_forward(self, x):
     out = self.avgpool(out)
     out = self.flatten(out)
     
-    print("\n[DEBUG] Layer before Linear:")
+    # Ensure full printing
+    torch.set_printoptions(threshold=float('inf'), linewidth=2000)
+
+    output_str = ""
+    mode = "Cleartext"
+
     if hasattr(out, 'decrypt'):
-        print("Encrypted object:", out)
+        mode = "FHE (Decrypted)"
         try:
             dec = out.decrypt()
             decoded = dec.decode()
-            print("Decrypted values:\n", decoded)
+            output_str = str(decoded)
         except Exception as e:
-            print(f"Could not decrypt: {e}")
+            output_str = f"Error decrypting: {e}"
     else:
-        print("Cleartext values:\n", out)
+        mode = "Cleartext"
+        output_str = str(out)
+    
+    print(f"\n[DEBUG] Layer before Linear ({mode}):")
+    print(output_str)
+
+    # Save to file if image name is available
+    if hasattr(self, 'current_img_name'):
+        filename = f"embedding_{self.current_img_name}.txt"
+        with open(filename, "a") as f:
+            f.write(f"--- {mode} ---\n")
+            f.write(output_str + "\n\n")
         
     return self.linear(out)
 
@@ -112,6 +128,12 @@ if not samples:
 print("Inférence en clair...\n")
 clear_outputs = []
 for img_name, inp in samples:
+    net.current_img_name = img_name
+    # Remove existing file to start fresh
+    filename = f"embedding_{img_name}.txt"
+    if os.path.exists(filename):
+        os.remove(filename)
+
     start_time = time.time()
     with torch.no_grad():
         out = net(inp)
@@ -138,6 +160,7 @@ print(f"Lancement de {len(samples)} inférences chiffrées...\n")
 for i, (img_name, inp) in enumerate(samples):
     print(f"--- Inférence {i+1}/{len(samples)}: {img_name} ---")
     
+    net.current_img_name = img_name
     out_clear = clear_outputs[i]
     
     # Encrypt
