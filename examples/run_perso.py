@@ -59,7 +59,34 @@ def new_forward(self, x):
             f.write(f"--- {mode} ---\n")
             f.write(output_str + "\n\n")
         
-    return self.linear(out)
+    final_out = self.linear(out)
+
+    # Process Final Output (After Linear)
+    output_str = ""
+    mode_final = "Cleartext"
+
+    if hasattr(final_out, 'decrypt'):
+        mode_final = "FHE (Decrypted) - Final Output"
+        try:
+            dec = final_out.decrypt()
+            decoded = dec.decode()
+            output_str = str(decoded)
+        except Exception as e:
+            output_str = f"Error decrypting: {e}"
+    else:
+        mode_final = "Cleartext - Final Output"
+        output_str = str(final_out)
+    
+    print(f"\n[DEBUG] Layer after Linear ({mode_final}):")
+    print(output_str)
+
+    if hasattr(self, 'current_img_name'):
+        filename = f"embedding_{self.current_img_name}.txt"
+        with open(filename, "a") as f:
+            f.write(f"--- {mode_final} ---\n")
+            f.write(output_str + "\n\n")
+
+    return final_out
 
 net.forward = types.MethodType(new_forward, net)
 
