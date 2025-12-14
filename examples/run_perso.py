@@ -151,6 +151,9 @@ if not samples:
     print("No valid samples loaded.")
     exit(1)
 
+# On ne garde qu'un échantillon pour tester
+samples = samples[:1]
+
 # Cleartext inference
 print("Inférence en clair...\n")
 clear_outputs = []

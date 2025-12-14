@@ -14,7 +14,7 @@ boot_params:
 orion:
   margin: 2 # >= 1
   embedding_method: hybrid # [hybrid, square]
-  backend: lattigo # [lattigo, openfhe, heaan]
+  backend: openfhe # [lattigo, openfhe, heaan]
 
   fuse_modules: true
   debug: true
