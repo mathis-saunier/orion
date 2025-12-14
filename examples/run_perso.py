@@ -1,5 +1,6 @@
 import time
 import math
+import types
 import torch
 import orion
 import orion.models as models
@@ -20,6 +21,31 @@ scheme = orion.init_scheme("../configs/resnet.yml")
 
 # Load the model structure
 net = models.ResNet20()
+
+# Monkey patch the forward method to print the layer before Linear
+def new_forward(self, x):
+    out = self.act(self.bn1(self.conv1(x)))
+    out = self.pool(out)
+    for layer in self.layers:
+        out = layer(out)
+    out = self.avgpool(out)
+    out = self.flatten(out)
+    
+    print("\n[DEBUG] Layer before Linear:")
+    if hasattr(out, 'decrypt'):
+        print("Encrypted object:", out)
+        try:
+            dec = out.decrypt()
+            decoded = dec.decode()
+            print("Decrypted values:\n", decoded)
+        except Exception as e:
+            print(f"Could not decrypt: {e}")
+    else:
+        print("Cleartext values:\n", out)
+        
+    return self.linear(out)
+
+net.forward = types.MethodType(new_forward, net)
 
 # Load the pre-trained weights
 model_path = "resnet_cifar.pth"
