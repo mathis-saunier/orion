@@ -39,7 +39,7 @@ go version # go version go1.22.3 linux/amd64
 ### Install Orion
 
 ```
-git clone https://github.com/baahl-nyu/orion.git
+git clone https://github.com/mathis-saunier/orion
 cd orion/
 pip install -e .
 ```
